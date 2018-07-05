@@ -54,45 +54,45 @@ RM = /home/hoaiphuong/Desktop/clion-2018.1.2/bin/cmake/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/hoaiphuong/CLionProjects/DetectLane
+CMAKE_SOURCE_DIR = /home/hoaiphuong/CLionProjects/LamLaiDetectLane
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/hoaiphuong/CLionProjects/DetectLane/cmake-build-debug
+CMAKE_BINARY_DIR = /home/hoaiphuong/CLionProjects/LamLaiDetectLane/cmake-build-debug
 
 #=============================================================================
-# Target rules for target CMakeFiles/DetectLane.dir
+# Target rules for target CMakeFiles/LamLaiDetectLane.dir
 
 # All Build rule for target.
-CMakeFiles/DetectLane.dir/all:
-	$(MAKE) -f CMakeFiles/DetectLane.dir/build.make CMakeFiles/DetectLane.dir/depend
-	$(MAKE) -f CMakeFiles/DetectLane.dir/build.make CMakeFiles/DetectLane.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/hoaiphuong/CLionProjects/DetectLane/cmake-build-debug/CMakeFiles --progress-num=1,2 "Built target DetectLane"
-.PHONY : CMakeFiles/DetectLane.dir/all
+CMakeFiles/LamLaiDetectLane.dir/all:
+	$(MAKE) -f CMakeFiles/LamLaiDetectLane.dir/build.make CMakeFiles/LamLaiDetectLane.dir/depend
+	$(MAKE) -f CMakeFiles/LamLaiDetectLane.dir/build.make CMakeFiles/LamLaiDetectLane.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/hoaiphuong/CLionProjects/LamLaiDetectLane/cmake-build-debug/CMakeFiles --progress-num=1,2 "Built target LamLaiDetectLane"
+.PHONY : CMakeFiles/LamLaiDetectLane.dir/all
 
 # Include target in all.
-all: CMakeFiles/DetectLane.dir/all
+all: CMakeFiles/LamLaiDetectLane.dir/all
 
 .PHONY : all
 
 # Build rule for subdir invocation for target.
-CMakeFiles/DetectLane.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/hoaiphuong/CLionProjects/DetectLane/cmake-build-debug/CMakeFiles 2
-	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/DetectLane.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/hoaiphuong/CLionProjects/DetectLane/cmake-build-debug/CMakeFiles 0
-.PHONY : CMakeFiles/DetectLane.dir/rule
+CMakeFiles/LamLaiDetectLane.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/hoaiphuong/CLionProjects/LamLaiDetectLane/cmake-build-debug/CMakeFiles 2
+	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/LamLaiDetectLane.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/hoaiphuong/CLionProjects/LamLaiDetectLane/cmake-build-debug/CMakeFiles 0
+.PHONY : CMakeFiles/LamLaiDetectLane.dir/rule
 
 # Convenience name for target.
-DetectLane: CMakeFiles/DetectLane.dir/rule
+LamLaiDetectLane: CMakeFiles/LamLaiDetectLane.dir/rule
 
-.PHONY : DetectLane
-
-# clean rule for target.
-CMakeFiles/DetectLane.dir/clean:
-	$(MAKE) -f CMakeFiles/DetectLane.dir/build.make CMakeFiles/DetectLane.dir/clean
-.PHONY : CMakeFiles/DetectLane.dir/clean
+.PHONY : LamLaiDetectLane
 
 # clean rule for target.
-clean: CMakeFiles/DetectLane.dir/clean
+CMakeFiles/LamLaiDetectLane.dir/clean:
+	$(MAKE) -f CMakeFiles/LamLaiDetectLane.dir/build.make CMakeFiles/LamLaiDetectLane.dir/clean
+.PHONY : CMakeFiles/LamLaiDetectLane.dir/clean
+
+# clean rule for target.
+clean: CMakeFiles/LamLaiDetectLane.dir/clean
 
 .PHONY : clean
 

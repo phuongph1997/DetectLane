@@ -1,4 +1,4 @@
-# Install script for directory: /home/hoaiphuong/CLionProjects/DetectLane
+# Install script for directory: /home/hoaiphuong/CLionProjects/LamLaiDetectLane
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -45,5 +45,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/home/hoaiphuong/CLionProjects/DetectLane/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/hoaiphuong/CLionProjects/LamLaiDetectLane/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

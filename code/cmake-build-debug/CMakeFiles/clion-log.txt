@@ -1,5 +1,5 @@
-/home/hoaiphuong/Desktop/clion-2018.1.2/bin/cmake/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /home/hoaiphuong/CLionProjects/DetectLane
--- Found OpenCV: /usr/local (found suitable version "3.4.1", minimum required is "3.1") 
+/home/hoaiphuong/Desktop/clion-2018.1.2/bin/cmake/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /home/hoaiphuong/CLionProjects/LamLaiDetectLane
+-- Found OpenCV: /usr/local (found version "3.4.1") 
 -- Configuring done
 -- Generating done
--- Build files have been written to: /home/hoaiphuong/CLionProjects/DetectLane/cmake-build-debug
+-- Build files have been written to: /home/hoaiphuong/CLionProjects/LamLaiDetectLane/cmake-build-debug
