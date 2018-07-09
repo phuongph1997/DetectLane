@@ -6,7 +6,7 @@
 
 #IncludeRegexTransform: 
 
-/home/hoaiphuong/CLionProjects/LamLaiDetectLane/main.cpp
+/home/hoaiphuong/Desktop/My Project/DetectLane/code/main.cpp
 iostream
 -
 opencv2/opencv.hpp

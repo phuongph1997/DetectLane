@@ -6,5 +6,5 @@ CXX_FLAGS = -g   -std=gnu++11
 
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/home/hoaiphuong/CLionProjects/LamLaiDetectLane/cmake-build-debug -I/home/hoaiphuong/CLionProjects/LamLaiDetectLane -isystem /usr/local/include -isystem /usr/local/include/opencv 
+CXX_INCLUDES = -I"/home/hoaiphuong/Desktop/My Project/DetectLane/code/cmake-build-debug" -I"/home/hoaiphuong/Desktop/My Project/DetectLane/code" -isystem /usr/local/include -isystem /usr/local/include/opencv 
 

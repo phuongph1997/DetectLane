@@ -1,3 +1,3 @@
-/home/hoaiphuong/CLionProjects/LamLaiDetectLane/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/home/hoaiphuong/CLionProjects/LamLaiDetectLane/cmake-build-debug/CMakeFiles/edit_cache.dir
-/home/hoaiphuong/CLionProjects/LamLaiDetectLane/cmake-build-debug/CMakeFiles/LamLaiDetectLane.dir
+/home/hoaiphuong/Desktop/My Project/DetectLane/code/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/home/hoaiphuong/Desktop/My Project/DetectLane/code/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/hoaiphuong/Desktop/My Project/DetectLane/code/cmake-build-debug/CMakeFiles/LamLaiDetectLane.dir
