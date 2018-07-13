@@ -1,225 +1,130 @@
 #include <iostream>
-#include <opencv2/opencv.hpp>
-#include "opencv2/imgproc/imgproc.hpp"
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include "opencv2/opencv.hpp"
 
 using namespace std;
 using namespace cv;
 
+int main() {
+
+    Size patternsize(7, 7);
+    int numBoards = 30;
+
+    vector<vector<Point3f>> object_points;
+    vector<vector<Point2f>> image_points;
+
+    vector<Point2f> corners;
+    //  int numSquares=3;
+    int successes = 0;
 
 
-int main( int argc, char** argv )
-{
-    VideoCapture cap(0);
-    if (!cap.isOpened()){
-        cout<<"error";
-        return -1;
+    Mat gray;
+    //  Mat source = imread("/home/hoaiphuong/Pictures/3.png");
+    vector<Point3f> obj;
+
+
+    for (int i = 0; i < 7; i++)
+        for (int j = 0; j < 7; j++)
+            obj.push_back(Point3f((float) j * 25, (float) i * 25, 0));
+
+
+    //   for(int j=0;j<49;j++)
+    //     obj.push_back(Point3f(j/7, j%7, 0.0f));
+    // int width=cap.get(CV_CAP_PROP_FRAME_WIDTH);
+    // int height=cap.get(CV_CAP_PROP_FRAME_HEIGHT);
+    // VideoWriter video("output.avi",CV_FOURCC('M','J','P','G'),30, Size(width,height));
+
+
+    Mat source;
+
+    for (;;) {
+        source= imread("/home/hoaiphuong/Desktop/photos/image/Image"+ to_string(successes) + ".jpg");
+     //   resize(source,source,Size(480))
+        cvtColor(source, gray, CV_BGR2GRAY);
+
+        bool patternfound = findChessboardCorners(gray, patternsize, corners,
+                                                  CALIB_CB_ADAPTIVE_THRESH + CALIB_CB_NORMALIZE_IMAGE +
+                                                  CALIB_CB_FAST_CHECK);
+
+        if (patternfound) {
+            cornerSubPix(gray, corners, Size(11,11 ), Size(-1, -1),
+                         TermCriteria(CV_TERMCRIT_EPS + CV_TERMCRIT_ITER, 40, 0.1));
+            drawChessboardCorners(source, patternsize, corners, patternfound);
+            // image_points.push_back(corners);
+            // object_points.push_back(obj);
+            // printf("Snap stored!\n");
+
+            image_points.push_back(corners);
+            object_points.push_back(obj);
+        }
+
+
+        imshow("hinh", source);
+            successes++;
+            waitKey(0);
+            if (successes >= numBoards)
+                break;
+
+
+        // cap >> source;
+        // if(waitKey(30) >= 0) break;
+        //   if(successes>=numBoards) {
+        //       break;
+        //      }
+//
+
+
     }
-  /*  long double execTime, prevCount, time;
-    execTime = prevCount = time = 0;
-    Mat edges, crop_img, gray, thresh;
-    vector<vector<Point> > contours;
-    vector<Vec4i> hierarchy;
-    namedWindow("edges",1);
-    */
-     Mat   ImageLeft;
-    int width=cap.get(CV_CAP_PROP_FRAME_WIDTH);
-        int height=cap.get(CV_CAP_PROP_FRAME_HEIGHT);
-   int dem=0;
-        // VideoWriter video("hinh.avi",CV_FOURCC('M','J','P','G'),15, Size(width/2,height));
-    for (;;)
-    {
 
-     //   prevCount = getTickCount() * 1.0000;
-        Mat source;
-        cap >> source; // get a new frame from camera
+    Mat intrinsic = Mat(3, 3, CV_32FC1);
+    Mat distCoeffs;
+    vector<Mat> rvecs;
+    vector<Mat> tvecs;
 
-        // Mat source = imread("/home/hoaiphuong/Desktop/photos/10.png",CV_LOAD_IMAGE_COLOR);
-       // imshow("source", source);
-        Mat imgHSV;
-        Rect ROI1(0,0,source.cols/2,source.rows);
+    intrinsic.ptr<float>(0)[0] = 1;
+    intrinsic.ptr<float>(1)[1] = 1;
 
-         ImageLeft = source(ROI1);
-        // video.write(ImageLeft);
-      //  Mat ImageRight = frame(ROI2);
-         imshow("ImageLeft",ImageLeft);
-           if (waitKey(30) == ' ')
-           {
-                imshow("hinh chup",ImageLeft);
-               cv::imwrite( cv::format( "/home/ubuntu/Phuong/code/image/Image%d.jpg", dem ), ImageLeft ); dem++;
-           }
+    calibrateCamera(object_points, image_points, source.size(), intrinsic, distCoeffs, rvecs, tvecs);
+
+    cout << intrinsic << endl;
+    cout << distCoeffs << endl;
+    Mat imageUndistorted;
+    VideoCapture cap2("/home/hoaiphuong/Desktop/photos/hinh2.avi");
+
+
+    Mat view, rview, map1, map2;
+       initUndistortRectifyMap(intrinsic, distCoeffs, Mat(),
+                         getOptimalNewCameraMatrix(intrinsic, distCoeffs, source.size(), 1,  source.size()),
+                          source.size(), CV_16SC2, map1, map2);
+    while (1) {
+
+
+        cap2 >> source;
+
+            remap(source, rview, map1, map2, INTER_LINEAR);
+            imshow("Image View", rview);
+        cout << rview.size()<< endl;
+            Rect Roi(23,54,48,72);
+            Mat a= rview(Roi);
+            Mat b;
+            resize(a,b,Size(480,320));
+            imshow("b",b);
+            waitKey(0);
+           // char c = waitKey();
+          //  if( c  == ESC_KEY || c == 'q' || c == 'Q' )
+          //      break;
 
 
 /*
-        cvtColor(source, imgHSV, COLOR_BGR2HLS); //Convert the captured frame from BGR to HSV
-
-        Mat imgThresholded;
-
-        inRange(imgHSV, Scalar(0, 238, 0), Scalar(178, 255, 255), imgThresholded); //Threshold the image
-        erode(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
-        dilate(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
-
-        //morphological closing (fill small holes in the foreground)
-        dilate(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
-        erode(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
-        imshow("imgThresholded", imgThresholded);
-        Mat cannyImage;
-        Canny(imgThresholded, cannyImage, 50, 100);
-        imshow("cannyImage", cannyImage);
-
-        vector<vector<Point> > contours;
-            vector<Vec4i> hierarchy;
-
-        findContours(cannyImage, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
-       // vector<Point> contours_poly;
-        vector<vector<Point> > contours_list;
-       //  vector<vector<Point> > contours_final;
-
-        for (size_t i = 0; i < contours.size(); i++) {
-            double a = arcLength(contours[i], false);
-            if (hierarchy[i][3] == -1 && a > 500) {
-                // convexHull(contours[i],hull[i]);
-                contours_list.push_back(contours[i]);
-            }
-
-
-        }
-        Mat ketqua(source.size(),CV_8UC1,Scalar(0));
-        //  ketqua.setTo(Scalar(0));
-      //  imshow("ketqua1", ketqua);
-        //  drawContours(ketqua, contours_list,-1, 255, CV_FILLED);
-        // Mat contoursImage = source.clone();
-
-        for(size_t i = 0; i < contours_list.size(); i++){
-            // approxPolyDP(contours[i], approxShape, arcLength(Mat(contours[i]), true)*0.04, true);
-            drawContours(ketqua, contours_list, i, Scalar(255));   // fill BLUE
-        }
-
-
-       // imshow("ketqua", ketqua);
-
-        bool kiemtra =true;
-
-        // Step of each window
-
-        vector<Point> locations;   // output, locations of non-zero pixels
-        vector<Point> centerLaneLeft;
-        vector<Point> centerLaneRight;
-       // vector<Point> test;
-        int dem=0;
-        for (int row = ketqua.rows; row >=0; row--)
-        {
-
-            for (int col = 0; col <= ketqua.cols/2; col ++)
-            {
-
-                //  ketqua.at<uchar>(row,col)=255;
-                if(ketqua.at<uchar>(Point(col,row))==255)
-                {
-                  //  test.push_back(Point(col,row));
-
-                    if(kiemtra==true)
-                    {
-                        locations.push_back(Point(col,row));
-                        dem =dem+1;
-                        kiemtra= false;
-                        if(dem ==2)
-                        {
-                            break;
-                        }
-                    }
-
-
-                }
-                else
-                {
-                    kiemtra= true;
-                }
-            }
-            if(dem ==2)
-            {
-                int x=(locations[0].x+locations[1].x) / 2;
-                int y=locations[0].y;
-                centerLaneLeft.push_back(Point(x,y));
-                row = row-20;
-            }
-            dem =0;
-            locations.clear();
-            kiemtra= true;
-        }
-
-        for (int row = ketqua.rows; row >=0; row--)
-        {
-
-            for (int col = ketqua.cols/2; col <= ketqua.cols; col ++)
-            {
-
-                //  ketqua.at<uchar>(row,col)=255;
-                if(ketqua.at<uchar>(Point(col,row))==255)
-                {
-                    //test.push_back(Point(col,row));
-
-                    if(kiemtra==true)
-                    {
-                        locations.push_back(Point(col,row));
-                        dem =dem+1;
-                        kiemtra= false;
-                        if(dem ==2)
-                        {
-                            break;
-                        }
-                    }
-
-
-                }
-                else
-                {
-                    kiemtra= true;
-                }
-            }
-            if(dem ==2)
-            {
-                int x=(locations[0].x+locations[1].x) / 2;
-                int y=locations[0].y;
-                centerLaneRight.push_back(Point(x,y));
-                row = row-20;
-            }
-            dem =0;
-            locations.clear();
-            kiemtra= true;
-        }
-
-
-        //   imshow("Step 2 draw Rectangle", ketqua);
-
-        for (int i=0 ; i < centerLaneLeft.size()-1 ; i++)
-        {
-            line(source,centerLaneLeft[i],centerLaneLeft[i+1],Scalar(0,255,0),5);
-            //   circle(source,centerLane[i],10,Scalar(0,255,0));
-
-        }
-        for (int i=0 ; i < centerLaneRight.size()-1 ; i++)
-        {
-            //line(source,centerLane[i],centerLane[i+1],Scalar(0,255,0));
-            line(source,centerLaneRight[i],centerLaneRight[i+1],Scalar(0,255,0),5);
-
-        }
-
-
-        execTime = (getTickCount()*1.0000 - prevCount) / (getTickFrequency() * 1.0000);
-
-
-    //    putText(source,"time detect "+to_string(execTime) + " s" , Point2f(100,100), FONT_HERSHEY_PLAIN, 2,  Scalar(0,0,255,255), 2);
-        //video.write(contoursImage);
-        // ROI=SobleImage(Rect(0,SobleImage.rows/2,SobleImage.cols,SobleImage.rows/2));
-        imshow("DetectLane", source);
-
-       cout << "execTime = " << execTime  << endl;
-       */
-
-        if (waitKey(30) == 27) break;
+        cap2 >> view;
+        undistort(view, imageUndistorted, intrinsic, distCoeffs,
+                  getOptimalNewCameraMatrix(intrinsic, distCoeffs, view.size(), 1, view.size()));
+        //  video.write(imageUndistorted);
+        //    cout << imageUndistorted.size()<< endl;
+        imshow("win1", view);
+        imshow("win2", imageUndistorted);
+*/
+        if (waitKey(30) >= 0) break;
     }
+
     return 0;
 }
