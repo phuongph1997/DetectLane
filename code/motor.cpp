@@ -4,89 +4,81 @@
 
 using namespace std;
 using namespace cv;
-
+using namespace cv::ml;
 double TinhGoc(Point xe, Point center);
 int main()
 {
     //VideoCapture cap("/home/ubuntu/Phuong/motor/lane2.avi");
 
-Controller *_Controller = new Controller();
-
-     VideoCapture cap(0);// open the default camera
+    Controller *_Controller = new Controller();
+// VideoWriter video("lane2.avi",CV_FOURCC('M','J','P','G'),15, Size(640,480));
+    VideoCapture cap(0);// open the default camera
     // VideoCapture cap("/home/hoaiphuong/Desktop/photos/hinh.avi");
-     if(!cap.isOpened())  // check if we succeeded
+    if(!cap.isOpened())  // check if we succeeded
 
-     {
-         cout <<"loi" << endl;
-         return -1;
-     }
+    {
+        cout <<"loi" << endl;
+        return -1;
+    }
 
-     float intrinsicL[9] = { 4021.647192987246, 0, 289.2681406534879,0, 2063.840795697641, 296.9477514262573,0, 0, 1 };
-     float distCoeffsL[5]= {-20.85217395672828, 496.0780489644387, -0.1519992457109527, 0.007373718783583586, -5847.008198395703};
+    float intrinsicL[9] = { 4021.647192987246, 0, 289.2681406534879,0, 2063.840795697641, 296.9477514262573,0, 0, 1 };
+    float distCoeffsL[5]= {-20.85217395672828, 496.0780489644387, -0.1519992457109527, 0.007373718783583586, -5847.008198395703};
 
-     float intrinsicR[9] = { 418.4535213265403, 0, 317.2840861380859,0, 420.3090290275157, 213.8242139124298,0, 0, 1 };
-     float distCoeffsR[5]= {-0.6785932084546785, 0.5380945237244258, 0.02055055818394564, 0.01534725027174448, -0.1741468280123287};
+    float intrinsicR[9] = { 418.4535213265403, 0, 317.2840861380859,0, 420.3090290275157, 213.8242139124298,0, 0, 1 };
+    float distCoeffsR[5]= {-0.6785932084546785, 0.5380945237244258, 0.02055055818394564, 0.01534725027174448, -0.1741468280123287};
 
-     Mat matrixcameraL  =Mat(3, 3, CV_32F, intrinsicL);
-     Mat DistortionCoefficientsL=Mat(1, 5, CV_32F, distCoeffsL);
-     Mat matrixcameraR  =Mat(3, 3, CV_32F, intrinsicL);
-     Mat DistortionCoefficientsR=Mat(1, 5, CV_32F, distCoeffsL);
-
-
-
-
-
-
-     Mat view, map1, map2,map3, map4;
-     Mat rview;
-     Size kichthuoc(1280,720);
+    Mat matrixcameraL  =Mat(3, 3, CV_32F, intrinsicL);
+    Mat DistortionCoefficientsL=Mat(1, 5, CV_32F, distCoeffsL);
+    Mat matrixcameraR  =Mat(3, 3, CV_32F, intrinsicL);
+    Mat DistortionCoefficientsR=Mat(1, 5, CV_32F, distCoeffsL);
 
 
 
 
 
-     initUndistortRectifyMap(matrixcameraL, DistortionCoefficientsL, Mat(),
-                             getOptimalNewCameraMatrix(matrixcameraL, DistortionCoefficientsL,  kichthuoc, 0,  Size(640,480),0, true),
-                             Size(640,480), CV_16SC2, map1, map2);
 
-     initUndistortRectifyMap(matrixcameraR, DistortionCoefficientsR, Mat(),
-                             getOptimalNewCameraMatrix(matrixcameraR, DistortionCoefficientsR,  kichthuoc, 0,  Size(640,480),0, true),
-                             Size(640,480), CV_16SC2, map3, map4);
+    Mat view, map1, map2,map3, map4;
+    Mat rview;
+    Size kichthuoc(1280,720);
 
 
-     int positionL=225 ,positionR= 500;
-     for(;;)
-     {
-
-         Mat frame;
-         cap >> frame; // get a new frame from camera
-         double prevTickCount = getTickCount();
-        // imshow("a",frame);
-
-         Rect ROI1(0,170,640,245);
-
-       //  imshow("source", source);
-        //   source=source(ROI);
-        // Rect ROI2(frame.cols/2,0,frame.cols- frame.cols/2,frame.rows);
-
-         Mat ImageLeft = frame(ROI1);
-       //  Mat ImageRight = frame(ROI2);
-        // imshow("ImageLeft",ImageLeft);
-        // imshow("ImageRight",ImageRight);
-        cout<<ImageLeft.size()<<endl;
-         remap(ImageLeft, ImageLeft, map1, map2, INTER_LINEAR);
-       ///  remap(ImageRight, ImageRight, map3, map4, INTER_LINEAR);
 
 
-         Point2f pc(ImageLeft.cols/2., ImageLeft.rows/2.);
-         Mat r = getRotationMatrix2D(pc, -180, 1.0);
 
-      //  warpAffine(ImageRight, ImageRight, r, ImageRight.size()); // what size I should use?
+    initUndistortRectifyMap(matrixcameraL, DistortionCoefficientsL, Mat(),
+                            getOptimalNewCameraMatrix(matrixcameraL, DistortionCoefficientsL,  kichthuoc, 0,  Size(640,480),0, true),
+                            Size(640,480), CV_16SC2, map1, map2);
+
+    initUndistortRectifyMap(matrixcameraR, DistortionCoefficientsR, Mat(),
+                            getOptimalNewCameraMatrix(matrixcameraR, DistortionCoefficientsR,  kichthuoc, 0,  Size(640,480),0, true),
+                            Size(640,480), CV_16SC2, map3, map4);
+
+
+    int positionL=225 ,positionR= 500;
+    for(;;)
+    {
+
+        Mat frame;
+        cap >> frame; // get a new frame from camera
+        double prevTickCount = getTickCount();
+
+
+        Rect ROI1(0,170,640,245);
+        Mat ImageLeft = frame(ROI1);
+        remap(ImageLeft, ImageLeft, map1, map2, INTER_LINEAR);
+
+
+
+        Point2f pc(ImageLeft.cols/2., ImageLeft.rows/2.);
+        Mat r = getRotationMatrix2D(pc, -180, 1.0);
+
+        //  warpAffine(ImageRight, ImageRight, r, ImageRight.size()); // what size I should use?
         warpAffine(ImageLeft, ImageLeft, r, ImageLeft.size());
-      //  imshow("right",ImageRight);
 
+        imshow("left",ImageLeft);
 
         Mat mask(ImageLeft.size(), CV_8UC1, Scalar(0));
+
         vector< vector<Point> >  co_ordinates;
         Point P1(250,0);
         Point P2(490,0);
@@ -102,8 +94,8 @@ Controller *_Controller = new Controller();
         //Rect ROI(0,180,source.cols,200);
 
         // Mat source = imread("/home/hoaiphuong/Desktop/photos/10.png",CV_LOAD_IMAGE_COLOR);
-      //  imshow("source", source);
-       //   source=source(ROI);
+        //  imshow("source", source);
+        //   source=source(ROI);
 
         Mat imgHSV;
         GaussianBlur(ImageLeft,ImageLeft,Size(5,5),5);
@@ -119,73 +111,63 @@ Controller *_Controller = new Controller();
 
 
 
-     //   erode(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
-    //    dilate(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
+        //   erode(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
+        //    dilate(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
 
         //morphological closing (fill small holes in the foreground)
-     //   dilate(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
-     //   erode(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
+        //   dilate(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
+        //   erode(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
 
-       bitwise_and(imgThresholded,mask,imgThresholded);
+        bitwise_and(imgThresholded,mask,imgThresholded);
+
+        imshow("imgThresholded",imgThresholded);
 
 
+        Point2f inputQuad[4];
+        Point2f outputQuad[4];
 
+        inputQuad[0] = Point2f( 250,0);
+        inputQuad[1] = Point2f( 100,244);
+        inputQuad[2] = Point2f( 639,244);
+        inputQuad[3] = Point2f( 490,0);
+        // The 4 points where the mapping is to be done , from top-left in clockwise order
+        outputQuad[0] = Point2f(250,0 );
+        outputQuad[1] = Point2f( 255,244);
+        outputQuad[2] = Point2f( 485,244);
+        outputQuad[3] = Point2f( 490,0);
 
-            Point2f inputQuad[4];
-            Point2f outputQuad[4];
-            /*
-            inputQuad[0] = Point2f( 280,190);
-            inputQuad[1] = Point2f( 0,300);
-            inputQuad[2] = Point2f( 590,300);
-            inputQuad[3] = Point2f( 380,190);
-            // The 4 points where the mapping is to be done , from top-left in clockwise order
-            outputQuad[0] = Point2f(0,0 );
-            outputQuad[1] = Point2f( 0,(imgThresholded.rows-1));
-            outputQuad[2] = Point2f( imgThresholded.cols-1,(imgThresholded.rows-1));
-            outputQuad[3] = Point2f( imgThresholded.cols-1,0);
-            */
-            inputQuad[0] = Point2f( 250,0);
-            inputQuad[1] = Point2f( 100,244);
-            inputQuad[2] = Point2f( 639,244);
-            inputQuad[3] = Point2f( 490,0);
-            // The 4 points where the mapping is to be done , from top-left in clockwise order
-            outputQuad[0] = Point2f(100,0 );
-            outputQuad[1] = Point2f( 100,244);
-            outputQuad[2] = Point2f( 639,244);
-            outputQuad[3] = Point2f( 639,0);
+        Mat transform= getPerspectiveTransform(inputQuad,outputQuad);
+        warpPerspective(imgThresholded,imgThresholded,transform,Size(600,245));
 
-                Mat transform= getPerspectiveTransform(inputQuad,outputQuad);
-                warpPerspective(imgThresholded,imgThresholded,transform,Size(600,245));
-
-        imshow("imgThresholded", imgThresholded);
+        imshow("eyes bird", imgThresholded);
 
 
 
-            threshold(imgThresholded,imgThresholded,100,255,THRESH_BINARY);
+        threshold(imgThresholded,imgThresholded,100,255,THRESH_BINARY);
 
-            int maxL=100;
-            int maxR=100;
+        int maxL=100;
+        int maxR=100;
 
-            int positionXe=373;
+        int positionXe=373;
 
-            for(int i =positionXe; i>0;i--)
-            {
-                int k= countNonZero(imgThresholded.col(i));
-                if(k>= maxL) {
-                    positionL = i;
-                   // break;
-                           maxL= k;
-                }
-
+        for(int i =positionXe; i>0;i--)
+        {
+            int k= countNonZero(imgThresholded.col(i));
+            if(k>= maxL) {
+                positionL = i;
+                // break;
+                maxL= k;
             }
+
+        }
 
         for(int i =positionXe; i<imgThresholded.cols;i++)
         {
-          //  cout<< countNonZero(imgThresholded.col(i))<< endl;
+            //  cout<< countNonZero(imgThresholded.col(i))<< endl;
             int k= countNonZero(imgThresholded.col(i));
             if(countNonZero(imgThresholded.col(i))>= maxR) {
                 positionR = i;
-               // break;
+                // break;
                 maxR= k;
             }
 
@@ -197,7 +179,7 @@ Controller *_Controller = new Controller();
 
 
 
-    //////============ set slibding window =====================///////////////////////
+        //////============ set slibding window =====================///////////////////////
         int nwindows = 9;
         int window_height =  imgThresholded.rows/nwindows;
 
@@ -206,7 +188,7 @@ Controller *_Controller = new Controller();
         Size imgSize(imgThresholded.size());
 
 
-    ///================== store center lane left, right ============///////
+        ///================== store center lane left, right ============///////
         vector<Point> centerLaneLeft;
         vector<Point> centerLaneRight;
         bool magin_left= false;
@@ -287,7 +269,7 @@ Controller *_Controller = new Controller();
                     }
                 }
                 else
-                    {
+                {
                     if (demR < demR2 && demR2 > minpixel) {
                         test = false;
                         positionR = positionR + 10;
@@ -309,7 +291,7 @@ Controller *_Controller = new Controller();
                             positionL = positionL - 10;
 
                         }
-                    } else { // // true dich sang phai
+                    } else { // dich sang phai
                         int demL2=countNonZero(imgThresholded(Left2));
                         if (demL < demL2 && demL2 > minpixel) {
                             test = false;
@@ -319,25 +301,25 @@ Controller *_Controller = new Controller();
                     }
                 }
                 if(have_magin_right)
+                {
+                    if(!magin_right) // dich sang trai
                     {
-                        if(!magin_right) // dich sang trai
+                        int demR1= countNonZero(imgThresholded(Rifgt1));
+                        if (demR < demR1 && demR1 > minpixel)
                         {
-                            int demR1= countNonZero(imgThresholded(Rifgt1));
-                            if (demR < demR1 && demR1 > minpixel)
-                            {
-                                test = false;
-                                positionR = positionR - 10;
+                            test = false;
+                            positionR = positionR - 10;
 
-                            }
-                        } else { // // true dich sang phai
-                            int demR2= countNonZero(imgThresholded(Rifgt2));
-                            if (demR < demR2 && demR2 > minpixel) {
-                                test = false;
-                                positionR = positionR + 10;
+                        }
+                    } else { // dich sang phai
+                        int demR2= countNonZero(imgThresholded(Rifgt2));
+                        if (demR < demR2 && demR2 > minpixel) {
+                            test = false;
+                            positionR = positionR + 10;
 
-                            }
                         }
                     }
+                }
             }
 
             if(test)
@@ -359,9 +341,9 @@ Controller *_Controller = new Controller();
         }
 
 
-    /////////========== Tim phuong trinh duong thang cua  lane trai ==============////////////////
-    ////////////////////////////////////////////////////////////////////////
-    ///////////////////////////////////////////////////////////////////////
+        /////////========== Tim phuong trinh duong thang cua  lane trai ==============////////////////
+        ////////////////////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////////
 
         float x1L = 0, x2L = 0, x3L = 0, x4L = 0, y1L = 0, xyL = 0, xy2L = 0;
         Mat matrixAL = Mat(3, 3, CV_32FC1);
@@ -379,9 +361,9 @@ Controller *_Controller = new Controller();
             xyL = xyL + x * y;
             xy2L = xy2L + x * x * y;
         }
-    /////////========== Tim phuong trinh duong thang cua  lane phai ==============////////////////
-    ////////////////////////////////////////////////////////////////////////
-    ///////////////////////////////////////////////////////////////////////
+        /////////========== Tim phuong trinh duong thang cua  lane phai ==============////////////////
+        ////////////////////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////////
         float x1R = 0, x2R = 0, x3R = 0, x4R = 0, y1R = 0, xyR = 0, xy2R = 0;
         Mat matrixAR = Mat(3, 3, CV_32FC1);
         Mat matrixBR = Mat(3, 1, CV_32FC1);
@@ -397,8 +379,8 @@ Controller *_Controller = new Controller();
             xyR = xyR + x * y;
             xy2R = xy2R + x * x * y;
         }
-    ////////////////===================== Dua cac gia tri vao ma tran ================///////////////////////
-    ///////////================ Left ===========///////////////
+        ////////////////===================== Dua cac gia tri vao ma tran ================///////////////////////
+        ///////////================ Left ===========///////////////
         matrixAL.at<float>(0, 0) = centerLaneLeft.size();
 
         matrixAL.at<float>(0, 1) = x1L;
@@ -417,7 +399,7 @@ Controller *_Controller = new Controller();
         matrixBL.at<float>(1, 0) = xyL;
         matrixBL.at<float>(2, 0) = xy2L;
 
-    ///////////================ Right ===========///////////////
+        ///////////================ Right ===========///////////////
         matrixAR.at<float>(0, 0) = centerLaneRight.size();
 
         matrixAR.at<float>(0, 1) = x1R;
@@ -437,28 +419,50 @@ Controller *_Controller = new Controller();
         matrixBR.at<float>(2, 0) = xy2R;
 
 
-    ////////////=============== Tim phuong trinh duong lane======================//////////////////////
-    /////////================ Left ================//////////////
+        ////////////=============== Tim phuong trinh duong lane======================//////////////////////
+        /////////================ Left ================//////////////
         matrixAL = matrixAL.inv();
         matrixCoefficientABCL = matrixAL * matrixBL;
-    /////////================ Right ================//////////////
+        /////////================ Right ================//////////////
         matrixAR = matrixAR.inv();
         matrixCoefficientABCR = matrixAR * matrixBR;
+  Mat ImageContours(imgThresholded.size(), CV_8UC1, Scalar(0));
+        for( int i=0;i< ImageContours.rows;i++)
+        {
+            int x = (matrixCoefficientABCL.at<float>(0, 0) + matrixCoefficientABCL.at<float>(1, 0) * i +
+                     matrixCoefficientABCL.at<float>(2, 0) * i * i);
 
+            ImageContours.at<uchar>(Point(x,i))= 255;
+        }
 
+        for( int i=0;i< ImageContours.rows;i++)
+        {
+            int x = (matrixCoefficientABCR.at<float>(0, 0) + matrixCoefficientABCR.at<float>(1, 0) * i +
+                     matrixCoefficientABCR.at<float>(2, 0) * i * i);
 
+            ImageContours.at<uchar>(Point(x,i))= 255;
+        }
         matrixCoefficientABCL= (matrixCoefficientABCL + matrixCoefficientABCR)/2;
 
 
-
         // vi tri lane center Point (x,110)
-            int x = (matrixCoefficientABCL.at<float>(0, 0) + matrixCoefficientABCL.at<float>(1, 0) * 110 +
-                      matrixCoefficientABCL.at<float>(2, 0) * 110 * 110);
+        int x = (matrixCoefficientABCL.at<float>(0, 0) + matrixCoefficientABCL.at<float>(1, 0) * 110 +
+                 matrixCoefficientABCL.at<float>(2, 0) * 110 * 110);
+ ImageContours.at<uchar>(Point(373,205))= 255;
 
+
+              for( int i=0;i< ImageContours.rows;i++)
+              {
+                  int x = (matrixCoefficientABCL.at<float>(0, 0) + matrixCoefficientABCL.at<float>(1, 0) * i +
+                           matrixCoefficientABCL.at<float>(2, 0) * i * i);
+
+                  ImageContours.at<uchar>(Point(x,i))= 255;
+              }
+              imshow("tam duong", ImageContours);
 
         double theta= TinhGoc(Point(373,205),Point(x,110));
-         _Controller->Speed(100,100);
-         _Controller->Handle(theta);
+       // _Controller->Speed(100,100);
+       // _Controller->Handle(theta);
 
 
                 double executionTime = (getTickCount() * 1.0000 - prevTickCount * 1.0000) / (getTickFrequency() * 1.0000);
@@ -471,8 +475,8 @@ Controller *_Controller = new Controller();
             }
 
     }
-    _Controller->Speed(0,0);
- _Controller->Handle(0);
+ //   _Controller->Speed(0,0);
+// _Controller->Handle(0);
     return 0;
 }
 
