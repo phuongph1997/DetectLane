@@ -183,7 +183,7 @@ int main()
         int nwindows = 9;
         int window_height =  imgThresholded.rows/nwindows;
 
-        int margin= 35;
+        int margin= 20;
 
         Size imgSize(imgThresholded.size());
 
@@ -204,11 +204,11 @@ int main()
             int win_xleft_high = positionL + margin ;
             int win_xright_low = positionR - margin ;
             int win_xright_high = positionR + margin ;
-            int marginX_low=35;
-            int marginX_high=35;
-            int win_size=70;
+            int marginX_low=20;
+            int marginX_high=20;
+            int win_size=40;
             bool test= true;
-            int minpixel= 100;
+            int minpixel= 70;
             if(win_xleft_low <0 )
                 win_xleft_low = 0;
 
@@ -223,8 +223,8 @@ int main()
             }
             Rect Rifgt(win_xright_low,win_y_low,win_xright_high-win_xright_low,win_y_high-win_y_low);
             Rect Left(win_xleft_low,win_y_low,win_xleft_high-win_xleft_low,win_y_high-win_y_low);
-            Rect Left2(win_xleft_low + 35, win_y_low, win_xleft_high - win_xleft_low, win_y_high - win_y_low);
-            Rect Rifgt1(win_xright_low - 35, win_y_low, win_xright_high - win_xright_low, win_y_high - win_y_low);
+            Rect Left2(win_xleft_low + 20, win_y_low, win_xleft_high - win_xleft_low, win_y_high - win_y_low);
+            Rect Rifgt1(win_xright_low - 20, win_y_low, win_xright_high - win_xright_low, win_y_high - win_y_low);
 
             if (win_xleft_low - marginX_low < 0) {
                 marginX_low = 0;
@@ -246,7 +246,7 @@ int main()
                 if( demL1 > demL2) {
                     if (demL < demL1 && demL1 > minpixel) {
                         test = false;
-                        positionL = positionL - 10;
+                        positionL = positionL - 5;
                         magin_left= true;
                         have_magin_left= true;
                     }
@@ -255,7 +255,7 @@ int main()
                 else {
                     if (demL < demL2 && demL2 > minpixel) {
                         test = false;
-                        positionL = positionL + 10;
+                        positionL = positionL + 5;
                         magin_left= false;
                         have_magin_left= true;
                     }
@@ -263,7 +263,7 @@ int main()
                 if( demR1 > demR2) {
                     if (demR < demR1 && demR1 > minpixel) {
                         test = false;
-                        positionR = positionR - 10;
+                        positionR = positionR - 5;
                         magin_right= false;
                         have_magin_right= true;
                     }
@@ -272,7 +272,7 @@ int main()
                 {
                     if (demR < demR2 && demR2 > minpixel) {
                         test = false;
-                        positionR = positionR + 10;
+                        positionR = positionR + 5;
                         magin_right= true;
                         have_magin_right= true;
                     }
@@ -288,14 +288,14 @@ int main()
                         if (demL < demL1 && demL1 > minpixel)
                         {
                             test = false;
-                            positionL = positionL - 10;
+                            positionL = positionL - 5;
 
                         }
                     } else { // dich sang phai
                         int demL2=countNonZero(imgThresholded(Left2));
                         if (demL < demL2 && demL2 > minpixel) {
                             test = false;
-                            positionL = positionL + 10;
+                            positionL = positionL + 5;
 
                         }
                     }
@@ -308,14 +308,14 @@ int main()
                         if (demR < demR1 && demR1 > minpixel)
                         {
                             test = false;
-                            positionR = positionR - 10;
+                            positionR = positionR - 5;
 
                         }
                     } else { // dich sang phai
                         int demR2= countNonZero(imgThresholded(Rifgt2));
                         if (demR < demR2 && demR2 > minpixel) {
                             test = false;
-                            positionR = positionR + 10;
+                            positionR = positionR + 5;
 
                         }
                     }
