@@ -4,14 +4,14 @@
 
 using namespace std;
 using namespace cv;
-
+using namespace cv::ml;
 double TinhGoc(Point xe, Point center);
 int main()
 {
     //VideoCapture cap("/home/ubuntu/Phuong/motor/lane2.avi");
 
     Controller *_Controller = new Controller();
-
+ VideoWriter video("lane2.avi",CV_FOURCC('M','J','P','G'),15, Size(640,480));
     VideoCapture cap(0);// open the default camera
     // VideoCapture cap("/home/hoaiphuong/Desktop/photos/hinh.avi");
     if(!cap.isOpened())  // check if we succeeded
@@ -55,15 +55,57 @@ int main()
 
 
     int positionL=225 ,positionR= 500;
+    int positionXe=373;
+//
+    vector< vector<Point> >  co_ordinates;
+    Point P1(250,0);
+    Point P2(490,0);
+    Point P3(639,244);
+    Point P4(100,244);
+    co_ordinates.push_back(vector<Point>());
+    co_ordinates[0].push_back(P1);
+    co_ordinates[0].push_back(P2);
+    co_ordinates[0].push_back(P3);
+    co_ordinates[0].push_back(P4);
+//
+//
+    Point2f inputQuad[4];
+    Point2f outputQuad[4];
+
+    inputQuad[0] = Point2f( 250,0);
+    inputQuad[1] = Point2f( 100,244);
+    inputQuad[2] = Point2f( 639,244);
+    inputQuad[3] = Point2f( 490,0);
+    // The 4 points where the mapping is to be done , from top-left in clockwise order
+    outputQuad[0] = Point2f(100,0 );
+    outputQuad[1] = Point2f( 100,244);
+    outputQuad[2] = Point2f( 639,244);
+    outputQuad[3] = Point2f( 639,0);
+    Mat transform= getPerspectiveTransform(inputQuad,outputQuad);
+//
+//
+     Rect ROI1(0,170,640,245);
+//
+
+    Size size = Size(32, 32);
+    Size block_size = Size(size.width / 4, size.height / 4);
+    Size block_stride = Size(size.width / 8, size.height / 8);
+    Size cell_size = block_stride;
+    int num_bins = 9;
+    HOGDescriptor hog(size, block_size, block_stride, cell_size, num_bins);
+
+
+    Ptr<SVM> svm2 = Algorithm::load<SVM>("/home/ubuntu/Phuong/DoAn2/trainsvm.xml");
+
     for(;;)
     {
 
         Mat frame;
         cap >> frame; // get a new frame from camera
-        double prevTickCount = getTickCount();
+        long double prevTickCount = getTickCount();
 
 
-        Rect ROI1(0,170,640,245);
+
         Mat ImageLeft = frame(ROI1);
         remap(ImageLeft, ImageLeft, map1, map2, INTER_LINEAR);
 
@@ -75,19 +117,9 @@ int main()
         //  warpAffine(ImageRight, ImageRight, r, ImageRight.size()); // what size I should use?
         warpAffine(ImageLeft, ImageLeft, r, ImageLeft.size());
 
-
-
+        Mat imgSignals= ImageLeft.clone();
+        imshow("test",ImageLeft);
         Mat mask(ImageLeft.size(), CV_8UC1, Scalar(0));
-        vector< vector<Point> >  co_ordinates;
-        Point P1(250,0);
-        Point P2(490,0);
-        Point P3(639,244);
-        Point P4(100,244);
-        co_ordinates.push_back(vector<Point>());
-        co_ordinates[0].push_back(P1);
-        co_ordinates[0].push_back(P2);
-        co_ordinates[0].push_back(P3);
-        co_ordinates[0].push_back(P4);
         drawContours( mask,co_ordinates,0, Scalar(255),CV_FILLED );
 
         //Rect ROI(0,180,source.cols,200);
@@ -119,23 +151,6 @@ int main()
 
         bitwise_and(imgThresholded,mask,imgThresholded);
 
-
-
-
-        Point2f inputQuad[4];
-        Point2f outputQuad[4];
-
-        inputQuad[0] = Point2f( 250,0);
-        inputQuad[1] = Point2f( 100,244);
-        inputQuad[2] = Point2f( 639,244);
-        inputQuad[3] = Point2f( 490,0);
-        // The 4 points where the mapping is to be done , from top-left in clockwise order
-        outputQuad[0] = Point2f(100,0 );
-        outputQuad[1] = Point2f( 100,244);
-        outputQuad[2] = Point2f( 639,244);
-        outputQuad[3] = Point2f( 639,0);
-
-        Mat transform= getPerspectiveTransform(inputQuad,outputQuad);
         warpPerspective(imgThresholded,imgThresholded,transform,Size(600,245));
 
        // imshow("imgThresholded", imgThresholded);
@@ -147,7 +162,7 @@ int main()
         int maxL=100;
         int maxR=100;
 
-        int positionXe=373;
+
 
         for(int i =positionXe; i>0;i--)
         {
@@ -444,6 +459,7 @@ int main()
 //=================================================================================//
 //=================================================================================//
 // =================================================================================//
+        cvtColor(imgSignals, imgHSV, COLOR_RGB2HSV);
        // Mat imgThresholded;
         Mat imgThresholded1;
       //  inRange(imgHSV, Scalar(0, 0, 200), Scalar(179, 255, 255), imgThresholded);
@@ -505,18 +521,12 @@ int main()
         Mat detectSigns;
         for(int i=0;i< boundRect.size();i++)
         {
-            detectSigns= source(boundRect[i]);
-            resize(detectSigns, detectSigns, Size(64, 64));
+            detectSigns= ImageLeft(boundRect[i]);
+            resize(detectSigns, detectSigns, Size(32, 32));
             cvtColor(detectSigns, detectSigns, COLOR_BGR2GRAY);
-            Size size = Size(64, 64);
-            Size block_size = Size(size.width / 4, size.height / 4);
-            Size block_stride = Size(size.width / 8, size.height / 8);
-            Size cell_size = block_stride;
-            int num_bins = 9;
-            HOGDescriptor hog(size, block_size, block_stride, cell_size, num_bins);
             vector< float> descriptorsValues;
             hog.compute(detectSigns, descriptorsValues, Size(8, 8), Size(0, 0));
-            Ptr<SVM> svm2 = Algorithm::load<SVM>("/home/hoaiphuong/CLionProjects/FindHOG/trainsvm.xml");
+
             int result=0;
             result= svm2->predict(descriptorsValues);
 
@@ -525,50 +535,50 @@ int main()
                 switch (result) {
 
                     case 1:
-                        rectangle(source,boundRect[i].tl(),boundRect[i].br(),Scalar(255,0,0),3);
-                        putText(source, "giao",boundRect[i].tl(),0,0.8,Scalar(0,0,255),2);
+                        rectangle(imgSignals,boundRect[i].tl(),boundRect[i].br(),Scalar(255,0,0),3);
+                        putText(imgSignals, "giao",boundRect[i].tl(),0,0.8,Scalar(0,0,255),2);
                         break;
                     case 2:
-                        rectangle(source,boundRect[i].tl(),boundRect[i].br(),Scalar(255,0,0),3);
-                        putText(source, "D sat",boundRect[i].tl(),0,0.8,Scalar(0,0,255),2);
+                        rectangle(imgSignals,boundRect[i].tl(),boundRect[i].br(),Scalar(255,0,0),3);
+                        putText(imgSignals, "D sat",boundRect[i].tl(),0,0.8,Scalar(0,0,255),2);
                         break;
                     case 3:
-                        rectangle(source,boundRect[i].tl(),boundRect[i].br(),Scalar(255,0,0),3);
-                        putText(source, "stop",boundRect[i].tl(),0,0.8,Scalar(0,0,255),2);
+                        rectangle(imgSignals,boundRect[i].tl(),boundRect[i].br(),Scalar(255,0,0),3);
+                        putText(imgSignals, "stop",boundRect[i].tl(),0,0.8,Scalar(0,0,255),2);
                         break;
                     case 4:
-                        rectangle(source,boundRect[i].tl(),boundRect[i].br(),Scalar(255,0,0),3);
-                        putText(source, "bend left",boundRect[i].tl(),0,0.8,Scalar(0,0,255),2);
+                        rectangle(imgSignals,boundRect[i].tl(),boundRect[i].br(),Scalar(255,0,0),3);
+                        putText(imgSignals, "bend left",boundRect[i].tl(),0,0.8,Scalar(0,0,255),2);
                         break;
                     case 5:
-                        rectangle(source,boundRect[i].tl(),boundRect[i].br(),Scalar(255,0,0),3);
-                        putText(source, "bend right",boundRect[i].tl(),0,0.8,Scalar(0,0,255),2);
+                        rectangle(imgSignals,boundRect[i].tl(),boundRect[i].br(),Scalar(255,0,0),3);
+                        putText(imgSignals, "bend right",boundRect[i].tl(),0,0.8,Scalar(0,0,255),2);
                         break;
                     case 6:
-                        rectangle(source,boundRect[i].tl(),boundRect[i].br(),Scalar(255,0,0),3);
-                        putText(source, "bend",boundRect[i].tl(),0,0.8,Scalar(0,0,255),2);
+                        rectangle(imgSignals,boundRect[i].tl(),boundRect[i].br(),Scalar(255,0,0),3);
+                        putText(imgSignals, "bend",boundRect[i].tl(),0,0.8,Scalar(0,0,255),2);
                         break;
                     case 7:
-                        rectangle(source,boundRect[i].tl(),boundRect[i].br(),Scalar(255,0,0),3);
-                        putText(source, "ban left",boundRect[i].tl(),0,0.8,Scalar(0,0,255),2);
+                        rectangle(imgSignals,boundRect[i].tl(),boundRect[i].br(),Scalar(255,0,0),3);
+                        putText(imgSignals, "ban left",boundRect[i].tl(),0,0.8,Scalar(0,0,255),2);
                         break;
                     case 8:
-                        rectangle(source,boundRect[i].tl(),boundRect[i].br(),Scalar(255,0,0),3);
-                        putText(source, "ban right",boundRect[i].tl(),0,0.8,Scalar(0,0,255),2);
+                        rectangle(imgSignals,boundRect[i].tl(),boundRect[i].br(),Scalar(255,0,0),3);
+                        putText(imgSignals, "ban right",boundRect[i].tl(),0,0.8,Scalar(0,0,255),2);
                         break;
                     case 9:
-                        rectangle(source,boundRect[i].tl(),boundRect[i].br(),Scalar(255,0,0),3);
-                        putText(source, "go right",boundRect[i].tl(),0,0.8,Scalar(0,0,255),2);
+                        rectangle(imgSignals,boundRect[i].tl(),boundRect[i].br(),Scalar(255,0,0),3);
+                        putText(imgSignals, "go right",boundRect[i].tl(),0,0.8,Scalar(0,0,255),2);
                         break;
                     case 10:
-                        rectangle(source,boundRect[i].tl(),boundRect[i].br(),Scalar(255,0,0),3);
-                        putText(source, "go left",boundRect[i].tl(),0,0.8,Scalar(0,0,255),2);
+                        rectangle(imgSignals,boundRect[i].tl(),boundRect[i].br(),Scalar(255,0,0),3);
+                        putText(imgSignals, "go left",boundRect[i].tl(),0,0.8,Scalar(0,0,255),2);
                         break;
 
 
                     case 11:
-                        rectangle(source,boundRect[i].tl(),boundRect[i].br(),Scalar(255,0,0),3);
-                        putText(source, "aroudabout",boundRect[i].tl(),0,0.8,Scalar(0,0,255),2);
+                        rectangle(imgSignals,boundRect[i].tl(),boundRect[i].br(),Scalar(255,0,0),3);
+                        putText(imgSignals, "aroudabout",boundRect[i].tl(),0,0.8,Scalar(0,0,255),2);
                         break;
 
                     default:
@@ -578,9 +588,9 @@ int main()
 
 
         }
-        //  video.write(source);
+          //video.write(imgSignals);
 
-        imshow("draw",source);
+        imshow("draw",imgSignals);
         //=================================================================================//
 //=================================================================================//
 // =================================================================================//
