@@ -54,7 +54,7 @@ int main()
                             Size(640,480), CV_16SC2, map3, map4);
 
 
-    int positionL=225 ,positionR= 500;
+    int positionL=191 ,positionR= 525;
     for(;;)
     {
 
@@ -63,7 +63,7 @@ int main()
         double prevTickCount = getTickCount();
 
 
-        Rect ROI1(0,170,640,245);
+        Rect ROI1(0,160,640,210);
         Mat ImageLeft = frame(ROI1);
         remap(ImageLeft, ImageLeft, map1, map2, INTER_LINEAR);
 
@@ -80,10 +80,10 @@ int main()
         Mat mask(ImageLeft.size(), CV_8UC1, Scalar(0));
 
         vector< vector<Point> >  co_ordinates;
-        Point P1(250,0);
-        Point P2(490,0);
-        Point P3(639,244);
-        Point P4(100,244);
+        Point P1(235,0);
+        Point P2(455,0);
+        Point P3(639,209);
+        Point P4(50,210);
         co_ordinates.push_back(vector<Point>());
         co_ordinates[0].push_back(P1);
         co_ordinates[0].push_back(P2);
@@ -126,15 +126,16 @@ int main()
         Point2f inputQuad[4];
         Point2f outputQuad[4];
 
-        inputQuad[0] = Point2f( 250,0);
-        inputQuad[1] = Point2f( 100,244);
-        inputQuad[2] = Point2f( 639,244);
-        inputQuad[3] = Point2f( 490,0);
-        // The 4 points where the mapping is to be done , from top-left in clockwise order
-        outputQuad[0] = Point2f(250,0 );
-        outputQuad[1] = Point2f( 255,244);
-        outputQuad[2] = Point2f( 485,244);
-        outputQuad[3] = Point2f( 490,0);
+
+    inputQuad[0] = Point2f( 235,0);
+    inputQuad[1] = Point2f( 50,209);
+    inputQuad[2] = Point2f( 639,209);
+    inputQuad[3] = Point2f( 455,0);
+    // The 4 points where the mapping is to be done , from top-left in clockwise order
+    outputQuad[0] = Point2f(100,0 );
+    outputQuad[1] = Point2f( 182,209);
+    outputQuad[2] = Point2f( 508,209);
+    outputQuad[3] = Point2f( 587,0);
 
         Mat transform= getPerspectiveTransform(inputQuad,outputQuad);
         warpPerspective(imgThresholded,imgThresholded,transform,Size(600,245));
@@ -183,7 +184,7 @@ int main()
         int nwindows = 9;
         int window_height =  imgThresholded.rows/nwindows;
 
-        int margin= 20;
+        int margin= 10;
 
         Size imgSize(imgThresholded.size());
 
@@ -204,11 +205,11 @@ int main()
             int win_xleft_high = positionL + margin ;
             int win_xright_low = positionR - margin ;
             int win_xright_high = positionR + margin ;
-            int marginX_low=20;
-            int marginX_high=20;
-            int win_size=40;
+            int marginX_low=10;
+            int marginX_high=10;
+            int win_size=20;
             bool test= true;
-            int minpixel= 70;
+            int minpixel= 200;
             if(win_xleft_low <0 )
                 win_xleft_low = 0;
 
@@ -221,10 +222,10 @@ int main()
                 marginX_high = 0;
 
             }
-            Rect Rifgt(win_xright_low,win_y_low,win_xright_high-win_xright_low,win_y_high-win_y_low);
+            Rect Right(win_xright_low,win_y_low,win_xright_high-win_xright_low,win_y_high-win_y_low);
             Rect Left(win_xleft_low,win_y_low,win_xleft_high-win_xleft_low,win_y_high-win_y_low);
-            Rect Left2(win_xleft_low + 20, win_y_low, win_xleft_high - win_xleft_low, win_y_high - win_y_low);
-            Rect Rifgt1(win_xright_low - 20, win_y_low, win_xright_high - win_xright_low, win_y_high - win_y_low);
+            Rect Left2(win_xleft_low + 10, win_y_low, win_xleft_high - win_xleft_low, win_y_high - win_y_low);
+            Rect Right1(win_xright_low - 10, win_y_low, win_xright_high - win_xright_low, win_y_high - win_y_low);
 
             if (win_xleft_low - marginX_low < 0) {
                 marginX_low = 0;
@@ -234,15 +235,15 @@ int main()
                 win_size = imgSize.width - (win_xright_low + marginX_high);
             }
             Rect Left1(win_xleft_low - marginX_low, win_y_low, win_xleft_high - win_xleft_low, win_y_high - win_y_low);
-            Rect Rifgt2(win_xright_low + marginX_high, win_y_low, win_size, win_y_high - win_y_low);
+            Rect Right2(win_xright_low + marginX_high, win_y_low, win_size, win_y_high - win_y_low);
             int demL=countNonZero(imgThresholded(Left));
             int demR= countNonZero(imgThresholded(Rifgt));
             if(magin_start == false)
             {
                 int demL1=countNonZero(imgThresholded(Left1));
-                int demR1= countNonZero(imgThresholded(Rifgt1));
+                int demR1= countNonZero(imgThresholded(Right1));
                 int demL2=countNonZero(imgThresholded(Left2));
-                int demR2= countNonZero(imgThresholded(Rifgt2));
+                int demR2= countNonZero(imgThresholded(Right2));
                 if( demL1 > demL2) {
                     if (demL < demL1 && demL1 > minpixel) {
                         test = false;
@@ -304,7 +305,7 @@ int main()
                 {
                     if(!magin_right) // dich sang trai
                     {
-                        int demR1= countNonZero(imgThresholded(Rifgt1));
+                        int demR1= countNonZero(imgThresholded(Right1));
                         if (demR < demR1 && demR1 > minpixel)
                         {
                             test = false;
@@ -312,7 +313,7 @@ int main()
 
                         }
                     } else { // dich sang phai
-                        int demR2= countNonZero(imgThresholded(Rifgt2));
+                        int demR2= countNonZero(imgThresholded(Right2));
                         if (demR < demR2 && demR2 > minpixel) {
                             test = false;
                             positionR = positionR + 5;
