@@ -54,7 +54,9 @@ int main()
                             Size(640,480), CV_16SC2, map3, map4);
 
 
-    int positionL=191 ,positionR= 525;
+    int positionL=110 ,positionR= 545;
+     Rect ROI1(0,0,640,480);
+      Rect ROI2(0,250,640,150);
     for(;;)
     {
 
@@ -63,7 +65,7 @@ int main()
         double prevTickCount = getTickCount();
 
 
-        Rect ROI1(0,160,640,210);
+
         Mat ImageLeft = frame(ROI1);
         remap(ImageLeft, ImageLeft, map1, map2, INTER_LINEAR);
 
@@ -75,15 +77,16 @@ int main()
         //  warpAffine(ImageRight, ImageRight, r, ImageRight.size()); // what size I should use?
         warpAffine(ImageLeft, ImageLeft, r, ImageLeft.size());
 
-        imshow("left",ImageLeft);
-
+      //  imshow("left",ImageLeft);
+        ImageLeft = ImageLeft(ROI2);
         Mat mask(ImageLeft.size(), CV_8UC1, Scalar(0));
 
         vector< vector<Point> >  co_ordinates;
         Point P1(235,0);
-        Point P2(455,0);
-        Point P3(639,209);
-        Point P4(50,210);
+        Point P2(545,0);
+        Point P3(639,149);
+        Point P4(50,149);
+
         co_ordinates.push_back(vector<Point>());
         co_ordinates[0].push_back(P1);
         co_ordinates[0].push_back(P2);
@@ -118,9 +121,9 @@ int main()
         //   dilate(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
         //   erode(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
 
-        bitwise_and(imgThresholded,mask,imgThresholded);
+      //  bitwise_and(imgThresholded,mask,imgThresholded);
 
-        imshow("imgThresholded",imgThresholded);
+      //  imshow("imgThresholded",imgThresholded);
 
 
         Point2f inputQuad[4];
@@ -128,28 +131,28 @@ int main()
 
 
     inputQuad[0] = Point2f( 235,0);
-    inputQuad[1] = Point2f( 50,209);
-    inputQuad[2] = Point2f( 639,209);
-    inputQuad[3] = Point2f( 455,0);
+    inputQuad[1] = Point2f( 100,149);
+    inputQuad[2] = Point2f( 639,149);
+    inputQuad[3] = Point2f( 500,0);
     // The 4 points where the mapping is to be done , from top-left in clockwise order
     outputQuad[0] = Point2f(100,0 );
-    outputQuad[1] = Point2f( 182,209);
-    outputQuad[2] = Point2f( 508,209);
-    outputQuad[3] = Point2f( 587,0);
+    outputQuad[1] = Point2f( 100,149);
+    outputQuad[2] = Point2f( 500,149);
+    outputQuad[3] = Point2f( 455,0);
 
         Mat transform= getPerspectiveTransform(inputQuad,outputQuad);
-        warpPerspective(imgThresholded,imgThresholded,transform,Size(600,245));
+        warpPerspective(imgThresholded,imgThresholded,transform,Size(649,149));
 
-        imshow("eyes bird", imgThresholded);
+
 
 
 
         threshold(imgThresholded,imgThresholded,100,255,THRESH_BINARY);
 
-        int maxL=100;
-        int maxR=100;
+        int maxL=20;
+        int maxR=20;
 
-        int positionXe=373;
+        int positionXe=330;
 
         for(int i =positionXe; i>0;i--)
         {
@@ -181,7 +184,7 @@ int main()
 
 
         //////============ set slibding window =====================///////////////////////
-        int nwindows = 9;
+        int nwindows = 6;
         int window_height =  imgThresholded.rows/nwindows;
 
         int margin= 10;
@@ -209,7 +212,7 @@ int main()
             int marginX_high=10;
             int win_size=20;
             bool test= true;
-            int minpixel= 200;
+            int minpixel= 30;
             if(win_xleft_low <0 )
                 win_xleft_low = 0;
 
@@ -237,7 +240,7 @@ int main()
             Rect Left1(win_xleft_low - marginX_low, win_y_low, win_xleft_high - win_xleft_low, win_y_high - win_y_low);
             Rect Right2(win_xright_low + marginX_high, win_y_low, win_size, win_y_high - win_y_low);
             int demL=countNonZero(imgThresholded(Left));
-            int demR= countNonZero(imgThresholded(Rifgt));
+            int demR= countNonZero(imgThresholded(Right));
             if(magin_start == false)
             {
                 int demL1=countNonZero(imgThresholded(Left1));
@@ -325,6 +328,9 @@ int main()
 
             if(test)
             {
+                rectangle(imgThresholded,Left.tl(),Left.br(),Scalar(255,0,0),1);
+                rectangle(imgThresholded,Right.tl(),Right.br(),Scalar(255,0,0),1);
+
                 centerLaneLeft.push_back(Point(positionL,(win_y_high+win_y_low)/2));
                 centerLaneRight.push_back(Point(positionR,(win_y_high+win_y_low)/2));
                 have_magin_left= false;
@@ -341,7 +347,7 @@ int main()
 
         }
 
-
+ imshow("eyes bird", imgThresholded);
         /////////========== Tim phuong trinh duong thang cua  lane trai ==============////////////////
         ////////////////////////////////////////////////////////////////////////
         ///////////////////////////////////////////////////////////////////////
@@ -446,11 +452,11 @@ int main()
         matrixCoefficientABCL= (matrixCoefficientABCL + matrixCoefficientABCR)/2;
 
 
-        // vi tri lane center Point (x,110)
-        int x = (matrixCoefficientABCL.at<float>(0, 0) + matrixCoefficientABCL.at<float>(1, 0) * 110 +
-                 matrixCoefficientABCL.at<float>(2, 0) * 110 * 110);
- ImageContours.at<uchar>(Point(373,205))= 255;
-
+        // vi tri lane center Point (x,30)
+        int x = (matrixCoefficientABCL.at<float>(0, 0) + matrixCoefficientABCL.at<float>(1, 0) * 30 +
+                 matrixCoefficientABCL.at<float>(2, 0) * 30 * 30);
+ ImageContours.at<uchar>(Point(330,110))= 255;
+        cout << "pount duong " <<x << endl;
 
               for( int i=0;i< ImageContours.rows;i++)
               {
@@ -461,9 +467,10 @@ int main()
               }
               imshow("tam duong", ImageContours);
 
-        double theta= TinhGoc(Point(373,205),Point(x,110));
-       // _Controller->Speed(100,100);
-       // _Controller->Handle(theta);
+        double theta= TinhGoc(Point(330,110),Point(x,30));
+
+        _Controller->Speed(90,90);
+        _Controller->Handle(theta);
 
 
                 double executionTime = (getTickCount() * 1.0000 - prevTickCount * 1.0000) / (getTickFrequency() * 1.0000);
@@ -476,8 +483,8 @@ int main()
             }
 
     }
- //   _Controller->Speed(0,0);
-// _Controller->Handle(0);
+    _Controller->Speed(0,0);
+ _Controller->Handle(0);
     return 0;
 }
 
@@ -487,8 +494,11 @@ double TinhGoc(Point xe, Point center)
         return 0;
     float a= xe.y-center.y;
     float b= abs(center.x-xe.x);
-double pi = acos(-1.0);
+    double pi = acos(-1.0);
+    if( center.x > xe.x)
     return  (atan(b/a)*180) / pi;
+    else
+        return  -(atan(b/a)*180) / pi;
 }
 
 
