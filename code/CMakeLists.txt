@@ -33,7 +33,7 @@ include_directories(include)
 #However, the file(GLOB...) allows for wildcard additions:
 file(GLOB SOURCES "*.cpp")
 
-set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/bin)
+set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR})
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 

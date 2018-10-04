@@ -1,0 +1,16 @@
+
+
+        cuda - CUDA-accelerated Computer Vision
+        cudaarithm - Operations on Matrices
+        cudabgsegm - Background Segmentation
+        cudacodec - Video Encoding/Decoding
+        cudafeatures2d - Feature Detection and Description
+        cudafilters - Image Filtering
+        cudaimgproc - Image Processing
+        cudalegacy - Legacy support
+        cudaoptflow - Optical Flow
+        cudastereo - Stereo Correspondence
+        cudawarping - Image Warping
+        cudev - Device layer
+
+

@@ -21,16 +21,18 @@ int main()
         return -1;
     }
 
-    float intrinsicL[9] = { 4021.647192987246, 0, 289.2681406534879,0, 2063.840795697641, 296.9477514262573,0, 0, 1 };
-    float distCoeffsL[5]= {-20.85217395672828, 496.0780489644387, -0.1519992457109527, 0.007373718783583586, -5847.008198395703};
+    float intrinsicL[9] = {252.8578156159297, 0, 327.7155720972848,0, 256.238463076993, 253.3375750459992,0, 0, 1 };
+    float distCoeffsL[5]= {-0.2616389054889315, 0.06165360001187491, 0.0007497641752947679, -0.002608843059660595, -0.005927874747253872};
 
-    float intrinsicR[9] = { 418.4535213265403, 0, 317.2840861380859,0, 420.3090290275157, 213.8242139124298,0, 0, 1 };
-    float distCoeffsR[5]= {-0.6785932084546785, 0.5380945237244258, 0.02055055818394564, 0.01534725027174448, -0.1741468280123287};
+    float intrinsicR[9] = { 249.2328012582979, 0, 342.2416053148595, 0, 250.925843791375, 240.1380869179251, 0, 0, 1 };
+    float distCoeffsR[5]= {-0.263126234967536, 0.06336631464190885, 0.00319951113422688, -0.0002882083266245706, -0.006085546912196437};
 
     Mat matrixcameraL  =Mat(3, 3, CV_32F, intrinsicL);
     Mat DistortionCoefficientsL=Mat(1, 5, CV_32F, distCoeffsL);
-    Mat matrixcameraR  =Mat(3, 3, CV_32F, intrinsicL);
-    Mat DistortionCoefficientsR=Mat(1, 5, CV_32F, distCoeffsL);
+    Mat matrixcameraR  =Mat(3, 3, CV_32F, intrinsicR);
+    Mat DistortionCoefficientsR=Mat(1, 5, CV_32F, distCoeffsR);
+
+
 
 
 
@@ -54,9 +56,10 @@ int main()
                             Size(640,480), CV_16SC2, map3, map4);
 
 
-    int positionL=110 ,positionR= 545;
+    int positionL=145 ,positionR= 430;
+    int positionXe=300;
      Rect ROI1(0,0,640,480);
-      Rect ROI2(0,250,640,150);
+    Rect ROI2(0,250,640,180);
     for(;;)
     {
 
@@ -82,10 +85,10 @@ int main()
         Mat mask(ImageLeft.size(), CV_8UC1, Scalar(0));
 
         vector< vector<Point> >  co_ordinates;
-        Point P1(235,0);
-        Point P2(545,0);
-        Point P3(639,149);
-        Point P4(50,149);
+        Point P1(220,0);
+        Point P2(420,0);
+        Point P3(630,179);
+        Point P4(10,179);
 
         co_ordinates.push_back(vector<Point>());
         co_ordinates[0].push_back(P1);
@@ -130,18 +133,18 @@ int main()
         Point2f outputQuad[4];
 
 
-    inputQuad[0] = Point2f( 235,0);
-    inputQuad[1] = Point2f( 100,149);
-    inputQuad[2] = Point2f( 639,149);
-    inputQuad[3] = Point2f( 500,0);
-    // The 4 points where the mapping is to be done , from top-left in clockwise order
-    outputQuad[0] = Point2f(100,0 );
-    outputQuad[1] = Point2f( 100,149);
-    outputQuad[2] = Point2f( 500,149);
-    outputQuad[3] = Point2f( 455,0);
+        inputQuad[0] = Point2f( 220,0);
+        inputQuad[1] = Point2f( 10,179);
+        inputQuad[2] = Point2f( 630,179);
+        inputQuad[3] = Point2f( 420,0);
+        // The 4 points where the mapping is to be done , from top-left in clockwise order
+        outputQuad[0] = Point2f(100,0 );
+        outputQuad[1] = Point2f( 100,179);
+        outputQuad[2] = Point2f( 500,179);
+        outputQuad[3] = Point2f( 500,0);
 
         Mat transform= getPerspectiveTransform(inputQuad,outputQuad);
-        warpPerspective(imgThresholded,imgThresholded,transform,Size(649,149));
+        warpPerspective(imgThresholded,imgThresholded,transform,Size(640,180));
 
 
 
@@ -149,10 +152,10 @@ int main()
 
         threshold(imgThresholded,imgThresholded,100,255,THRESH_BINARY);
 
-        int maxL=20;
-        int maxR=20;
+        int maxL=70;
+        int maxR=70;
 
-        int positionXe=330;
+
 
         for(int i =positionXe; i>0;i--)
         {
@@ -184,7 +187,7 @@ int main()
 
 
         //////============ set slibding window =====================///////////////////////
-        int nwindows = 6;
+        int nwindows = 9;
         int window_height =  imgThresholded.rows/nwindows;
 
         int margin= 10;
@@ -453,10 +456,19 @@ int main()
 
 
         // vi tri lane center Point (x,30)
-        int x = (matrixCoefficientABCL.at<float>(0, 0) + matrixCoefficientABCL.at<float>(1, 0) * 30 +
-                 matrixCoefficientABCL.at<float>(2, 0) * 30 * 30);
- ImageContours.at<uchar>(Point(330,110))= 255;
-        cout << "pount duong " <<x << endl;
+        int PointCenter = (matrixCoefficientABCL.at<float>(0, 0) + matrixCoefficientABCL.at<float>(1, 0) * 10 +
+                           matrixCoefficientABCL.at<float>(2, 0) * 10 * 10);
+
+        int PointXe = (matrixCoefficientABCL.at<float>(0, 0) + matrixCoefficientABCL.at<float>(1, 0) * 170 +
+                       matrixCoefficientABCL.at<float>(2, 0) * 170 * 170);
+
+        double theta= TinhGoc(Point(PointXe,170),Point(PointCenter,30));
+        if(theta > 0)
+        {
+            cout<<"cua phai goc " <<theta <<  endl;
+
+        } else
+            cout<<"cua trai goc " << theta << endl;
 
               for( int i=0;i< ImageContours.rows;i++)
               {
