@@ -1,8 +1,10 @@
 import cv2
 import numpy as np
+# top right, bot righ, bot left, top left
 def perspective_transform(img):
     imshape = img.shape
     #print (imshape)
+    
     src = np.float32([[(0.55*imshape[1], 0.63*imshape[0]), \
                         (imshape[1],imshape[0]), \
                         (0,imshape[0]), \
@@ -13,7 +15,7 @@ def perspective_transform(img):
                     [0.75*img.shape[1],img.shape[0]], \
                     [0.25*img.shape[1],img.shape[0]], \
                     [0.25*img.shape[1],0]])
-    #print (dst)
+    #print ('dst : %s'%(dst))
     M = cv2.getPerspectiveTransform(src, dst)
     #Minv = cv2.getPerspectiveTransform(dst, src)
     img_size = (imshape[1], imshape[0]) 
@@ -24,7 +26,10 @@ def region_of_interest(img, vertices):
     ignore_mask_color=255
     mask = np.zeros_like(img, dtype=np.uint8)
     #filling pixels inside the polygon defined by "vertices" with the fill color    
+    #print ('src ',vertices)    
+    #cv2.namedWindow('mask', cv2.WINDOW_NORMAL)    
     cv2.fillPoly(mask, vertices, ignore_mask_color)
+    #cv2.imshow('mask',mask)    
     #returning the image only where mask pixels are nonzero
     masked_image = cv2.bitwise_and(img, mask)
     return masked_image

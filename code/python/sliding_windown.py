@@ -71,7 +71,7 @@ def sliding_window(binary_warped):
     #print len(left_lane_inds)
     left_lane_inds = np.concatenate(left_lane_inds)
     right_lane_inds = np.concatenate(right_lane_inds)
-    print len(left_lane_inds)
+    #print len(left_lane_inds)
     # Extract left and right line pixel positions
     leftx = nonzerox[left_lane_inds]
     lefty = nonzeroy[left_lane_inds] 
@@ -79,16 +79,16 @@ def sliding_window(binary_warped):
     righty = nonzeroy[right_lane_inds]
     if (leftx.size < 5):
         left_lane.detected = False
-        print ("Left lane deteceted - False")
+        #print ("Left lane deteceted - False")
     else:
         left_lane.detected = True
-        print ("Left lane detected - true")                                                    
+        #print ("Left lane detected - true")                                                    
     if (rightx.size < 5):
         right_lane.detected = False
-        print ("Right lane detected False")
+        #print ("Right lane detected False")
     else:
         right_lane.detected = True
-        print ("Right lane detected True")
+        #print ("Right lane detected True")
     if left_lane.detected == True & right_lane.detected == True:
         # Fit a second order polynomial to each
         left_fit = np.polyfit(lefty, leftx, 2)
@@ -99,14 +99,14 @@ def sliding_window(binary_warped):
         right_lane.best_fit[0] = right_fit
         left_lane.best_fit = np.average(left_lane.best_fit[-left_lane.smoothen_nframes:], axis = 0)
         right_lane.best_fit = np.average(right_lane.best_fit[-right_lane.smoothen_nframes:], axis = 0)
-        print ("saved best fit")
+        #print ("saved best fit")
     else: 
         #use the history avg values 
         left_fit = left_lane.best_fit
         right_fit = right_lane.best_fit
     left_lane.detected == False
     right_lane.detected == False
-    cv2.imshow('sliding',binary_warped)
+    #cv2.imshow('sliding',binary_warped)
     return left_fit,right_fit,left_lane_inds, right_lane_inds
 def poly_fit(binary_warped,left_fit,right_fit,left_lane_inds, right_lane_inds, plot=False):
 
@@ -124,8 +124,11 @@ def poly_fit(binary_warped,left_fit,right_fit,left_lane_inds, right_lane_inds, p
     out_img = np.dstack((binary_warped, binary_warped, binary_warped))*255
     out_img[nonzeroy[left_lane_inds], nonzerox[left_lane_inds]] = [255, 0, 0]
     out_img[nonzeroy[right_lane_inds], nonzerox[right_lane_inds]] = [0, 0, 255]
+    out_img[ploty.astype('int'),left_fitx.astype('int')] = [0, 255, 255]
+    out_img[ploty.astype('int'),right_fitx.astype('int')] = [0, 255, 255]
     #out_img[nonzeroy[left_fitx], nonzerox[left_fitx]] = [0, 0, 255]
-    #out_img[nonzeroy[], nonzerox[right_lane_inds]] = [0, 0, 255]
+    #k = np.array (left_fitx,dtype=int)
+    #out_img[ploty,k] = [0, 255,0 ]
     cv2.imshow('out_img',out_img)
     if(plot):
         plt.imshow(out_img)
